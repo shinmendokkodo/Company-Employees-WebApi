@@ -16,4 +16,6 @@ public class CompanyRepository(RepositoryContext repositoryContext) : Repository
 
     public IEnumerable<Company> GetByIds(IEnumerable<Guid> companyIds, bool trackChanges) => 
         [.. FindByCondition(company => companyIds.Contains(company.Id), trackChanges)];
+
+    public void DeleteCompany(Company company) => Delete(company);
 }

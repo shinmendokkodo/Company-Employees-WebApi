@@ -21,4 +21,5 @@ public class EmployeeRepository(RepositoryContext repositoryContext) : Repositor
     public IEnumerable<Employee> GetByIds(Guid companyId, IEnumerable<Guid> employeeIds, bool trackChanges) =>
         [.. FindByCondition(employee => employee.CompanyId.Equals(companyId) && employeeIds.Contains(employee.Id), trackChanges)];
 
+    public void DeleteEmployee(Employee employee) => Delete(employee);
 }

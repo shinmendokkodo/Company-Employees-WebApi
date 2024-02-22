@@ -41,4 +41,11 @@ public class EmployeesController(IServiceManager service) : ControllerBase
         var companies = service.EmployeeService.GetByIds(companyId, employeeIds, trackChanges: false);
         return Ok(companies);
     }
+
+    [HttpDelete("{employeeId:guid}")] 
+    public IActionResult DeleteEmployeeForCompany(Guid companyId, Guid employeeId) 
+    { 
+        service.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, trackChanges: false); 
+        return NoContent(); 
+    }
 }
