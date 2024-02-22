@@ -26,8 +26,15 @@ public class CompaniesController(IServiceManager service) : ControllerBase
     [HttpPost]
     public IActionResult CreateCompany([FromBody] CompanyForCreationDto companyForCreationDto)
     {
-        if (companyForCreationDto is null) 
-            return BadRequest("CompanyForCreationDto object is null"); 
+        if (companyForCreationDto is null)
+        {
+            return BadRequest("CompanyForCreationDto object is null");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return UnprocessableEntity(ModelState);
+        }
 
         var company = service.CompanyService.CreateCompany(companyForCreationDto); 
         return CreatedAtRoute("CompanyById", new { companyId = company.Id }, company);
@@ -60,6 +67,11 @@ public class CompaniesController(IServiceManager service) : ControllerBase
         if (companyForUpdateDto is null)
         {
             return BadRequest("CompanyForUpdateDto object is null");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return UnprocessableEntity(ModelState);
         }
 
         service.CompanyService.UpdateCompany(companyId, companyForUpdateDto, trackChanges: true); 
