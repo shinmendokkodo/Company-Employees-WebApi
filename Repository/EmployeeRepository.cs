@@ -1,16 +1,19 @@
 ﻿using Contracts;
 using Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repository;
 
 public class EmployeeRepository(RepositoryContext repositoryContext) : RepositoryBase<Employee>(repositoryContext), IEmployeeRepository
 {
-    public IEnumerable<Employee> GetEmployees(Guid companyId, bool trackChanges) =>
-        [.. FindByCondition(employee => employee.CompanyId.Equals(companyId), trackChanges).OrderBy(employee => employee.Name)];
+    public async Task<IEnumerable<Employee>> GetEmployees(Guid companyId, bool trackChanges) => 
+        await FindByCondition(employee => employee.CompanyId.Equals(companyId), trackChanges)
+        .OrderBy(employee => employee.Name)
+        .ToListAsync();
     
-    public Employee? GetEmployee(Guid companyId, Guid employeeId, bool trackChanges) => 
-        FindByCondition(employee => employee.CompanyId.Equals(companyId) && employee.Id.Equals(employeeId), trackChanges)
-        .SingleOrDefault();
+    public async Task<Employee?> GetEmployee(Guid companyId, Guid employeeId, bool trackChanges) => 
+        await FindByCondition(employee => employee.CompanyId.Equals(companyId) && employee.Id.Equals(employeeId), trackChanges)
+        .SingleOrDefaultAsync();
 
     public void CreateEmployeeForCompany(Guid companyId, Employee employee) 
     { 
@@ -18,8 +21,9 @@ public class EmployeeRepository(RepositoryContext repositoryContext) : Repositor
         Create(employee); 
     }
 
-    public IEnumerable<Employee> GetByIds(Guid companyId, IEnumerable<Guid> employeeIds, bool trackChanges) =>
-        [.. FindByCondition(employee => employee.CompanyId.Equals(companyId) && employeeIds.Contains(employee.Id), trackChanges)];
+    public async Task<IEnumerable<Employee>> GetByIds(Guid companyId, IEnumerable<Guid> employeeIds, bool trackChanges) =>
+        await FindByCondition(employee => employee.CompanyId.Equals(companyId) && employeeIds.Contains(employee.Id), trackChanges)
+        .ToListAsync();
 
     public void DeleteEmployee(Employee employee) => Delete(employee);
 }
