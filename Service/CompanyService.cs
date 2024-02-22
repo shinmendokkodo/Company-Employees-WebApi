@@ -76,14 +76,16 @@ internal sealed class CompanyService(IRepositoryManager repository, ILoggerManag
 
     public void DeleteCompany(Guid companyId, bool trackChanges) 
     {
-        var company = repository.Company.GetCompany(companyId, trackChanges);
-
-        if (company is null)
-        {
-            throw new CompanyNotFoundException(companyId);
-        }
-
+        var company = repository.Company.GetCompany(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
+        
         repository.Company.DeleteCompany(company); 
+        repository.Save(); 
+    }
+
+    public void UpdateCompany(Guid companyId, CompanyForUpdateDto companyForUpdateDto, bool trackChanges) 
+    { 
+        var company = repository.Company.GetCompany(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
+        mapper.Map(companyForUpdateDto, company); 
         repository.Save(); 
     }
 }

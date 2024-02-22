@@ -9,4 +9,5 @@ public interface IEmployeeService
     EmployeeDto CreateEmployeeForCompany(Guid companyId, EmployeeForCreationDto employeeForCreationDto, bool trackChanges);
     IEnumerable<EmployeeDto> GetByIds(Guid companyId, IEnumerable<Guid> employeeIds, bool trackChanges);
     void DeleteEmployeeForCompany(Guid companyId, Guid employeeId, bool trackChanges);
+    void UpdateEmployeeForCompany(Guid companyId, Guid employeeId, EmployeeForUpdateDto employeeForUpdateDto, bool companyTrackChanges, bool employeeTrackChanges);
 }
