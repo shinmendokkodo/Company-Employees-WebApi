@@ -52,6 +52,7 @@ public static class ServiceExtensions
             {
                 config.RespectBrowserAcceptHeader = true;
                 config.ReturnHttpNotAcceptable = true;
+                config.InputFormatters.Insert(0, JsonPatchInputFormatter.GetJsonPatchInputFormatter());
             })
             .AddXmlDataContractSerializerFormatters()
             .AddCustomCsvFormatter()

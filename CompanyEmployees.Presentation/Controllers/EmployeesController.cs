@@ -1,4 +1,6 @@
 ﻿using CompanyEmployees.Presentation.ModelBinders;
+using Entities;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
@@ -58,6 +60,21 @@ public class EmployeesController(IServiceManager service) : ControllerBase
         }
 
         service.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employeeForUpdateDto, companyTrackChanges: false, employeeTrackChanges: true);
+        return NoContent(); 
+    }
+
+    [HttpPatch("{employeeId:guid}")] 
+    public IActionResult PartiallyUpdateEmployeeForCompany(Guid companyId, Guid employeeId, [FromBody] JsonPatchDocument<EmployeeForUpdateDto> jsonPatchDocument) 
+    { 
+        if (jsonPatchDocument is null)
+        {
+            return BadRequest("patchDoc object sent from client is null.");
+        }
+
+        (EmployeeForUpdateDto employeeForUpdateDto, Employee employee) = service.EmployeeService.GetEmployeeForPatch(companyId, employeeId, companyTrackChanges: false, employeeTrackChanges: true);
+        jsonPatchDocument.ApplyTo(employeeForUpdateDto); 
+        
+        service.EmployeeService.SaveChangesForPatch(employeeForUpdateDto, employee); 
         return NoContent(); 
     }
 }
