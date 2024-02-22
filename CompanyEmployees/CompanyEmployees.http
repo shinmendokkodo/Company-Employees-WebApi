@@ -1,6 +1,60 @@
-@CompanyEmployees_HostAddress = https://localhost:5001
+@HTTPSHostAddress = https://localhost:5001
+@companyId_1 = c9d4c053-49b6-410c-bc78-2d54a9991870
+@companyId_2_invalid = c9d4c053-49b6-410c-bc78-2d54a9991890
+@employeeId_1 = 86dba8c0-d178-41e7-938c-ed49778fb52a
+@employeeId_2_invalid = 86dba8c0-d178-41e7-938c-ed49774fb52a
 
-GET {{CompanyEmployees_HostAddress}}/api/companies
+### get all companies
+
+GET {{HTTPSHostAddress}}/api/companies
 Accept: application/json
 
-###
+### get company with valid id
+
+GET {{HTTPSHostAddress}}/api/companies/{{companyId_1}}
+Accept: application/json
+
+### get company with invalid id
+
+GET {{HTTPSHostAddress}}/api/companies/{{companyId_2_invalid}}
+Accept: application/json
+
+### get company employees with valid company id
+
+GET {{HTTPSHostAddress}}/api/companies/{{companyId_1}}/employees
+Accept: application/json
+
+### get company employees with invalid company id
+
+GET {{HTTPSHostAddress}}/api/companies/{{companyId_2_invalid}}/employees
+Accept: application/json
+
+### get employee with valid employee id
+
+GET {{HTTPSHostAddress}}/api/companies/{{companyId_1}}/employees/{{employeeId_1}}
+Accept: application/json
+
+### get employee with invalid employee id
+
+GET {{HTTPSHostAddress}}/api/companies/{{companyId_1}}/employees/{{employeeId_2_invalid}}
+Accept: application/json
+
+### get all companies in xml
+
+GET {{HTTPSHostAddress}}/api/companies
+Accept: application/xml
+
+### get all companies in text/xml
+
+GET {{HTTPSHostAddress}}/api/companies
+Accept: text/xml
+
+### get all companies with invalid format
+
+GET {{HTTPSHostAddress}}/api/companies
+Accept: application/css
+
+### get all companies in csv format
+
+GET {{HTTPSHostAddress}}/api/companies
+Accept: text/csv

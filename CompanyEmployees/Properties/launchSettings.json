@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "https": {
+    "CompanyEmployees": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
