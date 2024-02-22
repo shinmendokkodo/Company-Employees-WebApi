@@ -13,10 +13,12 @@ public class MappingProfile : Profile
                 configurationExpression.MapFrom(x => string.Join(' ', x.Address, x.Country))); 
         
         CreateMap<Employee, EmployeeDto>();
-        
+
+        CreateMap<CompanyForManipulationDto, Company>().ReverseMap();
+
         CreateMap<CompanyForCreationDto, Company>();
 
-        CreateMap<CompanyForUpdateDto, Company>().ReverseMap();
+        CreateMap<CompanyForUpdateDto, Company>();
 
         CreateMap<EmployeeForCreationDto, Employee>();
 
