@@ -21,10 +21,10 @@ internal sealed class EmployeeService(IRepositoryManager repository, ILoggerMana
         return employeeDtos;
     }
 
-    public EmployeeDto GetEmployee(Guid companyId, Guid id, bool trackChanges)
+    public EmployeeDto GetEmployee(Guid companyId, Guid employeeId, bool trackChanges)
     {
         _ = repository.Company.GetCompany(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
-        var employee = repository.Employee.GetEmployee(companyId, id, trackChanges) ?? throw new EmployeeNotFoundException(id);
+        var employee = repository.Employee.GetEmployee(companyId, employeeId, trackChanges) ?? throw new EmployeeNotFoundException(employeeId);
         return mapper.Map<EmployeeDto>(employee); 
     }
 
@@ -37,5 +37,47 @@ internal sealed class EmployeeService(IRepositoryManager repository, ILoggerMana
         repository.Save(); 
         
         return mapper.Map<EmployeeDto>(employee); 
+    }
+
+    public IEnumerable<EmployeeDto> GetByIds(Guid companyId, IEnumerable<Guid> employeeIds, bool trackChanges)
+    {
+        _ = repository.Company.GetCompany(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
+
+        if (employeeIds is null)
+        {
+            throw new IdParametersBadRequestException();
+        }
+
+        var employees = repository.Employee.GetByIds(companyId, employeeIds, trackChanges);
+
+        if (employeeIds.Count() != employees.Count())
+        {
+            throw new CollectionByIdsBadRequestException();
+        }
+
+        return mapper.Map<IEnumerable<EmployeeDto>>(employees);
+    }
+
+    public (IEnumerable<EmployeeDto> companyDtos, string employeeIds) CreateEmployeeCollection(Guid companyId, IEnumerable<EmployeeForCreationDto> employeeForCreationDtos)
+    {
+        _ = repository.Company.GetCompany(companyId, trackChanges: false) ?? throw new CompanyNotFoundException(companyId);
+
+        if (employeeForCreationDtos is null)
+        {
+            throw new EmployeeCollectionBadRequest();
+        }
+
+        var employees = mapper.Map<IEnumerable<Employee>>(employeeForCreationDtos);
+        foreach (var employee in employees)
+        {
+            repository.Employee.CreateEmployeeForCompany(companyId, employee);
+        }
+
+        repository.Save();
+
+        var employeeDtos = mapper.Map<IEnumerable<EmployeeDto>>(employees);
+        var employeeIds = string.Join(",", employeeDtos.Select(employee => employee.Id));
+
+        return (employeeDtos, employeeIds);
     }
 }

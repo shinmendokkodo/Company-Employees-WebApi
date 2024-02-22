@@ -20,9 +20,9 @@ internal sealed class CompanyService(IRepositoryManager repository, ILoggerManag
         return companyDtos;
     }
     
-    public CompanyDto GetCompany(Guid id, bool trackChanges)
+    public CompanyDto GetCompany(Guid companyId, bool trackChanges)
     {
-        var company = repository.Company.GetCompany(id, trackChanges) ?? throw new CompanyNotFoundException(id);
+        var company = repository.Company.GetCompany(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
         return mapper.Map<CompanyDto>(company); 
     }
 
@@ -36,32 +36,41 @@ internal sealed class CompanyService(IRepositoryManager repository, ILoggerManag
         return mapper.Map<CompanyDto>(company); 
     }
 
-    public IEnumerable<CompanyDto> GetByIds(IEnumerable<Guid> ids, bool trackChanges) 
+    public IEnumerable<CompanyDto> GetByIds(IEnumerable<Guid> companyIds, bool trackChanges) 
     { 
-        if (ids is null) 
-            throw new IdParametersBadRequestException(); 
+        if (companyIds is null)
+        {
+            throw new IdParametersBadRequestException();
+        }
+
+        var companies = repository.Company.GetByIds(companyIds, trackChanges); 
         
-        var companies = repository.Company.GetByIds(ids, trackChanges); 
-        
-        if (ids.Count() != companies.Count()) 
-            throw new CollectionByIdsBadRequestException(); 
-        
+        if (companyIds.Count() != companies.Count())
+        {
+            throw new CollectionByIdsBadRequestException();
+        }
+
         return mapper.Map<IEnumerable<CompanyDto>>(companies);  
     }
 
-    public (IEnumerable<CompanyDto> companies, string ids) CreateCompanyCollection(IEnumerable<CompanyForCreationDto> companyCollection) 
+    public (IEnumerable<CompanyDto> companyDtos, string companyIds) CreateCompanyCollection(IEnumerable<CompanyForCreationDto> companyForCreationDtos) 
     {
-        if (companyCollection is null) throw new CompanyCollectionBadRequest(); 
-        
-        var companyEntities = mapper.Map<IEnumerable<Company>>(companyCollection); 
-        foreach (var company in companyEntities) 
+        if (companyForCreationDtos is null)
+        {
+            throw new CompanyCollectionBadRequest();
+        }
+
+        var companies = mapper.Map<IEnumerable<Company>>(companyForCreationDtos); 
+        foreach (var company in companies) 
         { 
             repository.Company.CreateCompany(company); 
-        } 
+        }
+
         repository.Save(); 
         
-        var companyCollectionToReturn = mapper.Map<IEnumerable<CompanyDto>>(companyEntities); 
-        var ids = string.Join(",", companyCollectionToReturn.Select(c => c.Id)); 
-        return (companies: companyCollectionToReturn, ids: ids); 
+        var companyDtos = mapper.Map<IEnumerable<CompanyDto>>(companies); 
+        var companyIds = string.Join(",", companyDtos.Select(company => company.Id)); 
+
+        return (companyDtos, companyIds); 
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using Entities;
+﻿using Entities;
 using Microsoft.EntityFrameworkCore;
 using Repository.Configuration;
 
@@ -12,7 +11,7 @@ public class RepositoryContext(DbContextOptions options) : DbContext(options)
         modelBuilder.ApplyConfiguration(new CompanyConfiguration()); 
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
     }
-    
+
     public DbSet<Company>? Companies { get; set; }
     public DbSet<Employee>? Employees { get; set; }
 }

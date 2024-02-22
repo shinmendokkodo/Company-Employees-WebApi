@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CompanyEmployees.Presentation.ModelBinders;
+using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
 
@@ -15,20 +16,29 @@ public class EmployeesController(IServiceManager service) : ControllerBase
         return Ok(employees);
     }
 
-    [HttpGet("{id:guid}", Name = "GetEmployeeForCompany")]
-    public IActionResult GetEmployeeForCompany(Guid companyId, Guid id)
+    [HttpGet("{employeeId:guid}", Name = "GetEmployeeForCompany")]
+    public IActionResult GetEmployeeForCompany(Guid companyId, Guid employeeId)
     {
-        var employee = service.EmployeeService.GetEmployee(companyId, id, trackChanges: false); 
+        var employee = service.EmployeeService.GetEmployee(companyId, employeeId, trackChanges: false); 
         return Ok(employee);
     }
 
     [HttpPost]
     public IActionResult CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDto employeeForCreationDto)
     {
-        if (employeeForCreationDto is null) 
+        if (employeeForCreationDto is null)
+        {
             return BadRequest("EmployeeForCreationDto object is null");
+        }
 
         var employee = service.EmployeeService.CreateEmployeeForCompany(companyId, employeeForCreationDto, trackChanges: false);
-        return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employee.Id }, employee);
+        return CreatedAtRoute("GetEmployeeForCompany", new { companyId, employeeId = employee.Id }, employee);
+    }
+
+    [HttpGet("collection/({employeeIds})", Name = "EmployeeCollection")]
+    public IActionResult GetEmployeeCollection(Guid companyId, [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> employeeIds)
+    {
+        var companies = service.EmployeeService.GetByIds(companyId, employeeIds, trackChanges: false);
+        return Ok(companies);
     }
 }
