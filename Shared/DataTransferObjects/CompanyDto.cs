@@ -1,3 +1,13 @@
 ﻿namespace Shared.DataTransferObjects;
 
-public record CompanyDto(Guid Id, string Name, string FullAddress);
+public record CompanyDto : BaseDto
+{
+    public Guid Id { get; init; } 
+    public string? Name { get; init; } 
+    public string? FullAddress { get; init; }
+
+    public override string ToCsvString()
+    {
+        return $"\"{Id}\", \"{Name}\", \"{FullAddress}\"";
+    }
+}
