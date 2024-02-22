@@ -1,5 +1,6 @@
 using CompanyEmployees;
 using CompanyEmployees.Extensions;
+using CompanyEmployees.Presentation.ActionFilters;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.ConfigureApiBehavior();
+builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.ConfigureControllers();
 
 var app = builder.Build();
