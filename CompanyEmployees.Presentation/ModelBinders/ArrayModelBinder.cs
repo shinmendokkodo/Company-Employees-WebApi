@@ -9,23 +9,26 @@ internal class ArrayModelBinder : IModelBinder
     public Task BindModelAsync(ModelBindingContext bindingContext)
     {
         if (!bindingContext.ModelMetadata.IsEnumerableType)
-        { 
+        {
             bindingContext.Result = ModelBindingResult.Failed();
             return Task.CompletedTask;
         }
-        
-        var providedValue = bindingContext.ValueProvider.GetValue(bindingContext.ModelName).ToString(); 
-        
+
+        var providedValue = bindingContext
+            .ValueProvider.GetValue(bindingContext.ModelName)
+            .ToString();
+
         if (string.IsNullOrEmpty(providedValue))
-        { 
+        {
             bindingContext.Result = ModelBindingResult.Success(null);
             return Task.CompletedTask;
         }
-        
-        var genericType = bindingContext.ModelType.GetTypeInfo().GenericTypeArguments[0]; 
+
+        var genericType = bindingContext.ModelType.GetTypeInfo().GenericTypeArguments[0];
         var converter = TypeDescriptor.GetConverter(genericType);
 
-        var objectArray = providedValue.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
+        var objectArray = providedValue
+            .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
             .Select(x => converter.ConvertFromString(x.Trim()))
             .ToArray();
 

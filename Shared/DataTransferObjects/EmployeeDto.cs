@@ -2,8 +2,5 @@
 
 public record EmployeeDto(Guid Id, string Name, int Age, string Position) : BaseDto
 {
-    public override string ToCsvString()
-    {
-        return $"\"{Id}\", \"{Name}\", \"{Age}\", \"{Position}\"";
-    }
+    public override string ToCsvString() => $"\"{Id}\", \"{Name}\", \"{Age}\", \"{Position}\"";
 }

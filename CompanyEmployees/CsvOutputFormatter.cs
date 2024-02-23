@@ -1,12 +1,13 @@
 ﻿using System.Net.Mime;
+using System.Text;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using Shared.DataTransferObjects;
-using System.Text;
 
 namespace CompanyEmployees;
 
-public class CsvOutputFormatter<T> : TextOutputFormatter where T : BaseDto
+public class CsvOutputFormatter<T> : TextOutputFormatter
+    where T : BaseDto
 {
     public CsvOutputFormatter()
     {
@@ -15,7 +16,10 @@ public class CsvOutputFormatter<T> : TextOutputFormatter where T : BaseDto
         SupportedEncodings.Add(Encoding.Unicode);
     }
 
-    public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
+    public override async Task WriteResponseBodyAsync(
+        OutputFormatterWriteContext context,
+        Encoding selectedEncoding
+    )
     {
         var response = context.HttpContext.Response;
         var buffer = new StringBuilder();

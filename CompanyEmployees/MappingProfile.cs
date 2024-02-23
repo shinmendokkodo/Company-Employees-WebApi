@@ -6,12 +6,15 @@ namespace CompanyEmployees;
 
 public class MappingProfile : Profile
 {
-    public MappingProfile() 
-    { 
+    public MappingProfile()
+    {
         CreateMap<Company, CompanyDto>()
-            .ForMember(companyDto => companyDto.FullAddress, configurationExpression => 
-                configurationExpression.MapFrom(x => string.Join(' ', x.Address, x.Country))); 
-        
+            .ForMember(
+                companyDto => companyDto.FullAddress,
+                configurationExpression =>
+                    configurationExpression.MapFrom(x => string.Join(' ', x.Address, x.Country))
+            );
+
         CreateMap<Employee, EmployeeDto>();
 
         CreateMap<CompanyForManipulationDto, Company>().ReverseMap();
