@@ -1,4 +1,6 @@
-﻿using Entities;
+﻿using System.Linq.Dynamic.Core;
+using Entities;
+using Repository.Extensions.Utilities;
 
 namespace Repository;
 
@@ -20,7 +22,26 @@ public static class RepositoryEmployeeExtensions
             return employees;
         }
 
-        var lowerCaseTerm = searchTerm.Trim().ToLower();
-        return employees.Where(e => e.Name.ToLower().Contains(lowerCaseTerm));
+        return employees.Where(e =>
+            e.Name != null
+            && e.Name.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase)
+        );
+    }
+
+    public static IQueryable<Employee> Sort(
+        this IQueryable<Employee> employees,
+        string? orderByQueryString
+    )
+    {
+        if (string.IsNullOrWhiteSpace(orderByQueryString))
+        {
+            return employees.OrderBy(e => e.Name);
+        }
+
+        var orderQuery = OrderQueryBuilder.CreateOrderQuery<Employee>(orderByQueryString);
+
+        return string.IsNullOrWhiteSpace(orderQuery)
+            ? (IQueryable<Employee>)employees.OrderBy(e => e.Name)
+            : employees.OrderBy(orderQuery);
     }
 }
