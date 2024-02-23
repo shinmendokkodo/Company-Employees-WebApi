@@ -4,20 +4,21 @@ using Entities;
 using Entities.Exceptions;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
 
 namespace Service;
 
 internal sealed class CompanyService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper) : ICompanyService
 {
-    public async Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool trackChanges) 
+    public async Task<(IEnumerable<CompanyDto> companyDtos, MetaData metaData)> GetAllCompaniesAsync(CompanyParameters companyParameters, bool trackChanges) 
     {
-        var companies = await repository.Company.GetAllCompaniesAsync(trackChanges);
+        var companies = await repository.Company.GetAllCompaniesAsync(companyParameters, trackChanges);
         var companyDtos = mapper.Map<IEnumerable<CompanyDto>>(companies);
         
         logger.LogInfo($"All companies were returned successfully.");
         logger.LogInfo(companyDtos);
         
-        return companyDtos;
+        return (companyDtos, companies.MetaData);
     }
     
     public async Task<CompanyDto> GetCompanyAsync(Guid companyId, bool trackChanges)

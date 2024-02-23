@@ -1,10 +1,11 @@
-﻿using CompanyEmployees.Presentation.ActionFilters;
+﻿using System.Text.Json;
+using CompanyEmployees.Presentation.ActionFilters;
 using CompanyEmployees.Presentation.ModelBinders;
-using Entities;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
 
 namespace CompanyEmployees.Presentation.Controllers;
 
@@ -13,10 +14,11 @@ namespace CompanyEmployees.Presentation.Controllers;
 public class CompaniesController(IServiceManager service) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetCompanies()
+    public async Task<IActionResult> GetCompanies([FromQuery] CompanyParameters companyParameters)
     {
-        var companies = await service.CompanyService.GetAllCompaniesAsync(trackChanges: false);
-        return Ok(companies);
+        var (companyDtos, metaData) = await service.CompanyService.GetAllCompaniesAsync(companyParameters, trackChanges: false);
+        Response.Headers.TryAdd("X-Pagination", JsonSerializer.Serialize(metaData));
+        return Ok(companyDtos);
     }
 
     [HttpGet("{companyId:guid}", Name = "CompanyById")]
