@@ -2,7 +2,7 @@
 using Entities;
 using Shared.DataTransferObjects;
 
-namespace CompanyEmployees;
+namespace CompanyEmployees.Utilities.Mapper;
 
 public class MappingProfile : Profile
 {
@@ -17,14 +17,14 @@ public class MappingProfile : Profile
 
         CreateMap<Employee, EmployeeDto>();
 
-        CreateMap<CompanyForManipulationDto, Company>().ReverseMap();
+        CreateMap<CompanyManipulateDto, Company>().ReverseMap();
 
-        CreateMap<CompanyForCreationDto, Company>();
+        CreateMap<CompanyCreateDto, Company>();
 
-        CreateMap<CompanyForUpdateDto, Company>();
+        CreateMap<CompanyUpdateDto, Company>();
 
-        CreateMap<EmployeeForCreationDto, Employee>();
+        CreateMap<EmployeeCreateDto, Employee>();
 
-        CreateMap<EmployeeForUpdateDto, Employee>().ReverseMap();
+        CreateMap<EmployeeUpdateDto, Employee>().ReverseMap();
     }
 }

@@ -7,11 +7,13 @@ namespace Repository;
 public abstract class RepositoryBase<T>(RepositoryContext repositoryContext) : IRepositoryBase<T>
     where T : class
 {
-    public IQueryable<T> FindAll(bool trackChanges) =>
-        !trackChanges ? repositoryContext.Set<T>().AsNoTracking() : repositoryContext.Set<T>();
+    public IQueryable<T> FindAll(bool trackEntity) =>
+        !trackEntity 
+            ? repositoryContext.Set<T>().AsNoTracking() 
+            : repositoryContext.Set<T>();
 
-    public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges) =>
-        !trackChanges
+    public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackEntity) =>
+        !trackEntity
             ? repositoryContext.Set<T>().Where(expression).AsNoTracking()
             : repositoryContext.Set<T>().Where(expression);
 

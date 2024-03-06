@@ -4,9 +4,10 @@ namespace Repository;
 
 public sealed class RepositoryManager(RepositoryContext repositoryContext) : IRepositoryManager
 {
-    private readonly Lazy<ICompanyRepository> _companyRepository =
+    private readonly Lazy<ICompanyRepository> _companyRepository = 
         new(() => new CompanyRepository(repositoryContext));
-    private readonly Lazy<IEmployeeRepository> _employeeRepository =
+
+    private readonly Lazy<IEmployeeRepository> _employeeRepository = 
         new(() => new EmployeeRepository(repositoryContext));
 
     public ICompanyRepository Company => _companyRepository.Value;

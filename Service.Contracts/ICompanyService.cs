@@ -6,36 +6,21 @@ namespace Service.Contracts;
 
 public interface ICompanyService
 {
-    Task<(IEnumerable<CompanyDto> companyDtos, MetaData metaData)> GetAllCompaniesAsync(
-        CompanyParameters companyParameters,
-        bool trackChanges
-    );
+    Task<(IEnumerable<CompanyDto> companyDtos, Metadata metadata)> GetAllAsync(CompanyParameters companyParameters, bool trackCompany = false);
 
-    Task<CompanyDto> GetCompanyAsync(Guid companyId, bool trackChanges);
+    Task<CompanyDto> GetByIdAsync(Guid companyId, bool trackChanges = false);
 
-    Task<CompanyDto> CreateCompanyAsync(CompanyForCreationDto company);
+    Task<CompanyDto> CreateAsync(CompanyCreateDto company);
 
-    Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<Guid> companyIds, bool trackChanges);
+    Task<IEnumerable<CompanyDto>> GetByIdsAsync(IEnumerable<Guid> companyIds, bool trackChanges = false);
 
-    Task<(IEnumerable<CompanyDto> companyDtos, string companyIds)> CreateCompanyCollectionAsync(
-        IEnumerable<CompanyForCreationDto> companyForCreationDtos
-    );
+    Task<(IEnumerable<CompanyDto> companyDtos, string companyIds)> CreateCollectionAsync(IEnumerable<CompanyCreateDto> companyCreateDtos);
 
-    Task DeleteCompanyAsync(Guid companyId, bool trackChanges);
+    Task DeleteAsync(Guid companyId, bool trackChanges = false);
 
-    Task UpdateCompanyAsync(
-        Guid companyId,
-        CompanyForUpdateDto companyForUpdateDto,
-        bool trackChanges
-    );
+    Task UpdateAsync(Guid companyId, CompanyUpdateDto companyUpdateDto, bool trackChanges = true);
 
-    Task<(
-        CompanyForManipulationDto companyForManipulationDto,
-        Company company
-    )> GetCompanyForPatchAsync(Guid companyId, bool trackChanges);
-    
-    Task SaveChangesForPatchAsync(
-        CompanyForManipulationDto companyForManipulationDto,
-        Company company
-    );
+    Task<(CompanyManipulateDto companyManipulateDto, Company company)> GetByIdPatchAsync(Guid companyId, bool trackCompany = true);
+
+    Task SavePatchAsync(CompanyManipulateDto companyManipulateDto, Company company);
 }

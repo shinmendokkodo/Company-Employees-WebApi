@@ -5,12 +5,9 @@ namespace Contracts;
 
 public interface ICompanyRepository
 {
-    Task<PagedList<Company>> GetAllCompaniesAsync(
-        CompanyParameters companyParameters,
-        bool trackChanges
-    );
-    Task<Company?> GetCompanyAsync(Guid companyId, bool trackChanges);
-    void CreateCompany(Company company);
-    Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> companyIds, bool trackChanges);
-    void DeleteCompany(Company company);
+    Task<PagedList<Company>> GetAllAsync(CompanyParameters companyParams, bool trackCompany);
+    Task<Company?> GetByIdAsync(Guid companyId, bool trackCompany);
+    void Create(Company company);
+    Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> companyIds, bool trackCompany);
+    void Delete(Company company);
 }

@@ -2,7 +2,7 @@
 
 namespace Shared.DataTransferObjects;
 
-public record CompanyForManipulationDto
+public record CompanyManipulateDto
 {
     [Required(ErrorMessage = "Company name is a required field.")]
     [MaxLength(60, ErrorMessage = "Maximum length for the Name is 60 characters.")]

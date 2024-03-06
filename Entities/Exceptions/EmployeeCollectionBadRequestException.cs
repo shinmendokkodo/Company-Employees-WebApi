@@ -1,4 +1,4 @@
 ﻿namespace Entities.Exceptions;
 
-public sealed class EmployeeCollectionBadRequest()
+public sealed class EmployeeCollectionBadRequestException()
     : BadRequestException("Employee collection sent from a client is null.");

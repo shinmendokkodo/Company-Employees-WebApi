@@ -58,3 +58,38 @@ Accept: application/css
 
 GET {{HTTPSHostAddress}}/api/companies
 Accept: text/csv
+
+### get company employees with valid company id in csv
+
+GET {{HTTPSHostAddress}}/api/companies/{{companyId_1}}/employees
+Accept: text/csv
+
+### get company employees with valid company id in xml
+
+GET {{HTTPSHostAddress}}/api/companies/{{companyId_1}}/employees
+Accept: text/xml
+
+### create company
+
+POST {{HTTPSHostAddress}}/api/companies
+Content-Type: application/json
+
+{
+  "name": "Marketing Solutions Ltd",
+  "address": "242 Sunny Avenue, K 334",
+  "country": "USA"
+}
+
+### create company with null
+
+POST {{HTTPSHostAddress}}/api/companies
+Content-Type: application/json
+
+### create company
+
+POST {{HTTPSHostAddress}}/api/companies
+Content-Type: application/json
+
+{
+  "name": "Marketing Solutions Ltd"
+}

@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using CompanyEmployees.Presentation.ActionFilters;
 using CompanyEmployees.Presentation.ModelBinders;
-using Entities;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -15,136 +14,76 @@ namespace CompanyEmployees.Presentation.Controllers;
 public class EmployeesController(IServiceManager service) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetEmployeesForCompany(
-        Guid companyId,
-        [FromQuery] EmployeeParameters employeeParameters
-    )
+    public async Task<IActionResult> GetAll(Guid companyId, [FromQuery] EmployeeParameters employeeParams)
     {
-        var (employeeDtos, metaData) = await service.EmployeeService.GetEmployeesAsync(
-            companyId,
-            employeeParameters,
-            trackChanges: false
-        );
+        var (employeeDtos, metaData) = await service.EmployeeService.GetAllAsync(companyId, employeeParams);
         Response.Headers.TryAdd("X-Pagination", JsonSerializer.Serialize(metaData));
         return Ok(employeeDtos);
     }
 
-    [HttpGet("{employeeId:guid}", Name = "GetEmployeeForCompany")]
-    public async Task<IActionResult> GetEmployeeForCompany(Guid companyId, Guid employeeId)
+    [HttpGet("{employeeId:guid}", Name = "GetById")]
+    public async Task<IActionResult> GetById(Guid companyId, Guid employeeId)
     {
-        var employee = await service.EmployeeService.GetEmployeeAsync(
-            companyId,
-            employeeId,
-            trackChanges: false
-        );
+        var employee = await service.EmployeeService.GetByIdAsync(companyId, employeeId);
         return Ok(employee);
+    }
+
+    [HttpGet("collection/({employeeIds})", Name = "GetByIds")]
+    public async Task<IActionResult> GetByIds(Guid companyId, [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> employeeIds)
+    {
+        var companies = await service.EmployeeService.GetByIdsAsync(companyId, employeeIds, false);
+        return Ok(companies);
     }
 
     [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<IActionResult> CreateEmployeeForCompany(
-        Guid companyId,
-        [FromBody] EmployeeForCreationDto employeeForCreationDto
-    )
+    public async Task<IActionResult> Create(Guid companyId, [FromBody] EmployeeCreateDto employeeCreateDto)
     {
-        var employee = await service.EmployeeService.CreateEmployeeForCompanyAsync(
-            companyId,
-            employeeForCreationDto,
-            trackChanges: false
-        );
-        return CreatedAtRoute(
-            "GetEmployeeForCompany",
-            new { companyId, employeeId = employee.Id },
-            employee
-        );
-    }
-
-    [HttpGet("collection/({employeeIds})", Name = "EmployeeCollection")]
-    public async Task<IActionResult> GetEmployeeCollection(
-        Guid companyId,
-        [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> employeeIds
-    )
-    {
-        var companies = await service.EmployeeService.GetByIdsAsync(
-            companyId,
-            employeeIds,
-            trackChanges: false
-        );
-        return Ok(companies);
+        var employee = await service.EmployeeService.CreateAsync(companyId, employeeCreateDto);
+        return CreatedAtRoute("GetById", new { companyId, employeeId = employee.Id }, employee);
     }
 
     [HttpPost("collection")]
-    public async Task<IActionResult> CreateEmployeeCollection(
-        Guid companyId,
-        [FromBody] IEnumerable<EmployeeForCreationDto> employeeForCreationDtos
-    )
+    public async Task<IActionResult> CreateCollection(Guid companyId, [FromBody] IEnumerable<EmployeeCreateDto> employeeCreateDtos)
     {
-        var (employeeDtos, employeeIds) =
-            await service.EmployeeService.CreateEmployeesForCompanyCollectionAsync(
-                companyId,
-                employeeForCreationDtos
-            );
-        return CreatedAtRoute("EmployeeCollection", new { companyId, employeeIds }, employeeDtos);
-    }
-
-    [HttpDelete("{employeeId:guid}")]
-    public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid employeeId)
-    {
-        await service.EmployeeService.DeleteEmployeeForCompanyAsync(
-            companyId,
-            employeeId,
-            trackChanges: false
-        );
-        return NoContent();
+        var (employeeDtos, employeeIds) =  await service.EmployeeService.CreateCollectionAsync(companyId, employeeCreateDtos);
+        return CreatedAtRoute("GetByIds", new { companyId, employeeIds }, employeeDtos);
     }
 
     [HttpPut("{employeeId:guid}")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<IActionResult> UpdateEmployeeForCompany(
-        Guid companyId,
-        Guid employeeId,
-        [FromBody] EmployeeForUpdateDto employeeForUpdateDto
-    )
+    public async Task<IActionResult> Update(Guid companyId, Guid employeeId, [FromBody] EmployeeUpdateDto employeeUpdateDto)
     {
-        await service.EmployeeService.UpdateEmployeeForCompanyAsync(
-            companyId,
-            employeeId,
-            employeeForUpdateDto,
-            companyTrackChanges: false,
-            employeeTrackChanges: true
-        );
+        await service.EmployeeService.UpdateAsync(companyId, employeeId, employeeUpdateDto);
         return NoContent();
     }
 
     [HttpPatch("{employeeId:guid}")]
-    public async Task<IActionResult> PartiallyUpdateEmployeeForCompany(
-        Guid companyId,
-        Guid employeeId,
-        [FromBody] JsonPatchDocument<EmployeeForUpdateDto> jsonPatchDocument
-    )
+    public async Task<IActionResult> Patch(Guid companyId, Guid employeeId, [FromBody] JsonPatchDocument<EmployeeUpdateDto> jsonPatchDocument)
     {
         if (jsonPatchDocument is null)
         {
-            return BadRequest("patchDoc object sent from client is null.");
+            return BadRequest("Patch object sent from client is null.");
         }
 
-        (EmployeeForUpdateDto employeeForUpdateDto, Employee employee) =
-            await service.EmployeeService.GetEmployeeForPatchAsync(
-                companyId,
-                employeeId,
-                companyTrackChanges: false,
-                employeeTrackChanges: true
-            );
-        jsonPatchDocument.ApplyTo(employeeForUpdateDto, ModelState);
+        (var employeeUpdateDto, var employee) = await service.EmployeeService.GetByIdPatchAsync(companyId, employeeId);
+        jsonPatchDocument.ApplyTo(employeeUpdateDto, ModelState);
 
-        TryValidateModel(employeeForUpdateDto);
+        TryValidateModel(employeeUpdateDto);
 
         if (!ModelState.IsValid)
         {
             return UnprocessableEntity(ModelState);
         }
 
-        await service.EmployeeService.SaveChangesForPatchAsync(employeeForUpdateDto, employee);
+        await service.EmployeeService.SavePatchAsync(employeeUpdateDto, employee);
+        return NoContent();
+    }
+
+    [HttpDelete("{employeeId:guid}")]
+    public async Task<IActionResult> Delete(Guid companyId, Guid employeeId)
+    {
+        await service.EmployeeService.DeleteAsync(companyId, employeeId);
         return NoContent();
     }
 }

@@ -1,6 +1,7 @@
-using CompanyEmployees;
 using CompanyEmployees.Extensions;
 using CompanyEmployees.Presentation.ActionFilters;
+using CompanyEmployees.Utilities.ExceptionHandler;
+using CompanyEmployees.Utilities.Mapper;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +25,9 @@ var app = builder.Build();
 app.UseExceptionHandler(_ => { });
 
 if (app.Environment.IsProduction())
+{
     app.UseHsts();
+}
 
 // Configure the HTTP request pipeline.
 

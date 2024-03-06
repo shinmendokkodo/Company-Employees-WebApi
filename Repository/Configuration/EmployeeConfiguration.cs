@@ -8,7 +8,8 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 {
     public void Configure(EntityTypeBuilder<Employee> builder)
     {
-        builder.HasData(
+        builder.HasData
+        (
             new Employee
             {
                 Id = new Guid("80abbca8-664d-4b20-b5de-024705497d4a"),

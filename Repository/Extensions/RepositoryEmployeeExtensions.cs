@@ -6,7 +6,7 @@ namespace Repository;
 
 public static class RepositoryEmployeeExtensions
 {
-    public static IQueryable<Employee> FilterEmployees(
+    public static IQueryable<Employee> Filter(
         this IQueryable<Employee> employees,
         uint minAge,
         uint maxAge

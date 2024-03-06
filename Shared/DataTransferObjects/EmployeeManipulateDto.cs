@@ -2,7 +2,7 @@
 
 namespace Shared.DataTransferObjects;
 
-public abstract record EmployeeForManipulationDto
+public abstract record EmployeeManipulateDto
 {
     [Required(ErrorMessage = "Employee name is a required field.")]
     [MaxLength(30, ErrorMessage = "Maximum length for the Name is 30 characters.")]

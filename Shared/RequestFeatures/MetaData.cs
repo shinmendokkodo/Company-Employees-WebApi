@@ -1,6 +1,6 @@
 ﻿namespace Shared.RequestFeatures;
 
-public class MetaData
+public class Metadata
 {
     public int CurrentPage { get; set; }
     public int TotalPages { get; set; }

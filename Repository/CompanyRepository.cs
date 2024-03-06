@@ -5,44 +5,31 @@ using Shared.RequestFeatures;
 
 namespace Repository;
 
-public class CompanyRepository(RepositoryContext repositoryContext)
-    : RepositoryBase<Company>(repositoryContext),
-        ICompanyRepository
+public class CompanyRepository(RepositoryContext repositoryContext) : RepositoryBase<Company>(repositoryContext), ICompanyRepository
 {
-    public async Task<PagedList<Company>> GetAllCompaniesAsync(
-        CompanyParameters companyParameters,
-        bool trackChanges
-    )
+    public async Task<PagedList<Company>> GetAllAsync(CompanyParameters companyParams, bool trackCompany)
     {
-        var companies = await FindAll(trackChanges)
-            .Search(companyParameters.SearchTerm)
-            .Sort(companyParameters.OrderBy)
-            .Skip((companyParameters.PageNumber - 1) * companyParameters.PageSize)
-            .Take(companyParameters.PageSize)
+        var companies = await FindAll(trackCompany)
+            .Search(companyParams.SearchTerm)
+            .Sort(companyParams.OrderBy)
+            .Skip((companyParams.PageNumber - 1) * companyParams.PageSize)
+            .Take(companyParams.PageSize)
             .ToListAsync();
 
-        var count = await FindAll(trackChanges).CountAsync();
+        var count = await FindAll(trackCompany).CountAsync();
 
-        return new PagedList<Company>(
-            companies,
-            count,
-            companyParameters.PageNumber,
-            companyParameters.PageSize
-        );
+        return new PagedList<Company>(companies, count, companyParams.PageNumber, companyParams.PageSize);
     }
 
-    public async Task<Company?> GetCompanyAsync(Guid companyId, bool trackChanges) =>
-        await FindByCondition(company => company.Id.Equals(companyId), trackChanges)
+    public async Task<Company?> GetByIdAsync(Guid companyId, bool trackCompany) =>
+        await FindByCondition(c => c.Id.Equals(companyId), trackCompany)
             .SingleOrDefaultAsync();
 
-    public void CreateCompany(Company company) => Create(company);
+    public new void Create(Company company) => base.Create(company);
 
-    public async Task<IEnumerable<Company>> GetByIdsAsync(
-        IEnumerable<Guid> companyIds,
-        bool trackChanges
-    ) =>
-        await FindByCondition(company => companyIds.Contains(company.Id), trackChanges)
+    public async Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> companyIds, bool trackCompany) =>
+        await FindByCondition(c => companyIds.Contains(c.Id), trackCompany)
             .ToListAsync();
 
-    public void DeleteCompany(Company company) => Delete(company);
+    public new void Delete(Company company) => base.Delete(company);
 }

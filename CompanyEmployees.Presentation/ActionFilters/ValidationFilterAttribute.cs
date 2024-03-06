@@ -1,31 +1,35 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Entities.Exceptions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace CompanyEmployees.Presentation.ActionFilters;
 
 public class ValidationFilterAttribute : IActionFilter
 {
-    public ValidationFilterAttribute() { }
-
     public void OnActionExecuting(ActionExecutingContext context)
     {
         var action = context.RouteData.Values["action"];
         var controller = context.RouteData.Values["controller"];
-        var param = context
-            .ActionArguments.SingleOrDefault(x => x.Value?.ToString()?.Contains("Dto") ?? false)
+        var param = context.ActionArguments.SingleOrDefault(x => x.Value?.ToString()?.Contains("Dto") ?? false)
             .Value;
 
         if (param is null)
         {
-            context.Result = new BadRequestObjectResult(
-                $"Object is null. Controller: {controller}, action: {action}"
-            );
+            context.Result = new BadRequestObjectResult($"Object is null. Controller: {controller}, action: {action}");
             return;
+            //throw new NullRequestException("Invalid request. Request body is null.");
         }
 
         if (!context.ModelState.IsValid)
         {
             context.Result = new UnprocessableEntityObjectResult(context.ModelState);
+            /*
+            throw new UnprocessableRequestException(JsonSerializer.Serialize(context.ModelState.ToDictionary(
+                k => k.Key,
+                v => v.Value.Errors.Select(x => x.ErrorMessage).ToArray())));
+            */
         }
     }
 

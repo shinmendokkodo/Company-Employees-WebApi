@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using Shared.DataTransferObjects;
 
-namespace CompanyEmployees;
+namespace CompanyEmployees.Formatters.Output;
 
 public class CsvOutputFormatter<T> : TextOutputFormatter
     where T : BaseDto
