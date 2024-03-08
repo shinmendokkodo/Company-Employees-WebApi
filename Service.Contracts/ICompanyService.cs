@@ -1,4 +1,5 @@
-﻿using Entities;
+﻿using Entities.LinkModels;
+using Entities.Models;
 using Shared.DataTransferObjects;
 using Shared.RequestFeatures;
 
@@ -6,7 +7,7 @@ namespace Service.Contracts;
 
 public interface ICompanyService
 {
-    Task<(IEnumerable<CompanyDto> companyDtos, Metadata metadata)> GetAllAsync(CompanyParameters companyParameters, bool trackCompany = false);
+    Task<(LinkResponse linkResponse, Metadata metadata)> GetAllAsync(CompanyLinkParameters linkParams, bool trackCompany = false);
 
     Task<CompanyDto> GetByIdAsync(Guid companyId, bool trackChanges = false);
 

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using CompanyEmployees.Presentation.ActionFilters;
 using CompanyEmployees.Presentation.ModelBinders;
+using Entities.LinkModels;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -14,11 +15,15 @@ namespace CompanyEmployees.Presentation.Controllers;
 public class CompaniesController(IServiceManager service) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] CompanyParameters companyParameters)
+    [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
+    public async Task<IActionResult> GetAll([FromQuery] CompanyParameters companyParams)
     {
-        var (companyDtos, metadata) = await service.CompanyService.GetAllAsync(companyParameters);
+        var companyLinkParams = new CompanyLinkParameters(companyParams, HttpContext);
+
+        var (linkResponse, metadata) = await service.CompanyService.GetAllAsync(companyLinkParams);
         Response.Headers.TryAdd("X-Pagination", JsonSerializer.Serialize(metadata));
-        return Ok(companyDtos);
+
+        return linkResponse.HasLinks ? Ok(linkResponse.LinkedEntities) : Ok(linkResponse.ShapedEntities);
     }
 
     [HttpGet("{companyId:guid}", Name = "CompanyById")]

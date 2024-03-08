@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Contracts;
+﻿using Contracts;
 using NLog;
 
 namespace LoggerService;
@@ -10,40 +9,15 @@ public class LoggerManager : ILoggerManager
 
     public LoggerManager() { }
 
-    public void LogDebug(string message) => Logger.Debug(message);
+    public void LogTrace(string message, params object[] args) => Logger.Trace(message, args);
 
-    public void LogDebug<T>(T input)
-    {
-        string json = JsonSerialize(input);
-        Logger.Debug(json);
-    }
+    public void LogDebug(string message, params object[] args) => Logger.Debug(message, args);
 
-    public void LogError(string message) => Logger.Error(message);
+    public void LogError(string message, params object[] args) => Logger.Error(message, args);
 
-    public void LogError<T>(T input)
-    {
-        string json = JsonSerialize(input);
-        Logger.Error(json);
-    }
+    public void LogFatal(string message, params object[] args) => Logger.Fatal(message, args);
 
-    public void LogInfo(string message) => Logger.Info(message);
+    public void LogInfo(string message, params object[] args) => Logger.Info(message, args);
 
-    public void LogInfo<T>(T input)
-    {
-        string json = JsonSerialize(input);
-        Logger.Info(json);
-    }
-
-    public void LogWarn(string message) => Logger.Warn(message);
-
-    public void LogWarn<T>(T input)
-    {
-        string json = JsonSerialize(input);
-        Logger.Warn(json);
-    }
-
-    private static string JsonSerialize<T>(T input)
-    {
-        return JsonSerializer.Serialize(input);
-    }
+    public void LogWarn(string message, params object[] args) => Logger.Warn(message, args);
 }

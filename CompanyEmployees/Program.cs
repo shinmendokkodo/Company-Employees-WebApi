@@ -1,5 +1,4 @@
 using CompanyEmployees.Extensions;
-using CompanyEmployees.Presentation.ActionFilters;
 using CompanyEmployees.Utilities.ExceptionHandler;
 using CompanyEmployees.Utilities.Mapper;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -17,8 +16,10 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.ConfigureApiBehavior();
-builder.Services.AddScoped<ValidationFilterAttribute>();
+builder.Services.ConfigureFilters();
+builder.Services.ConfigureDataShaping();
 builder.Services.ConfigureControllers();
+builder.Services.ConfigureCustomMediaTypes();
 
 var app = builder.Build();
 

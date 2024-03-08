@@ -1,14 +1,18 @@
 ﻿using CompanyEmployees.Formatters.Input;
 using CompanyEmployees.Formatters.Output;
 using CompanyEmployees.Presentation;
+using CompanyEmployees.Presentation.ActionFilters;
+using CompanyEmployees.Utilities.Links;
 using Contracts;
 using LoggerService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using Repository;
 using Service;
 using Service.Contracts;
+using Service.DataShaping;
 using Shared.DataTransferObjects;
 
 namespace CompanyEmployees.Extensions;
@@ -44,8 +48,7 @@ public static class ServiceExtensions
     private static IMvcBuilder AddCustomCsvFormatter(this IMvcBuilder builder) =>
         builder.AddMvcOptions(options =>
         {
-            options.OutputFormatters.Add(new CsvOutputFormatter<CompanyDto>());
-            options.OutputFormatters.Add(new CsvOutputFormatter<EmployeeDto>());
+            options.OutputFormatters.Add(new CsvOutputFormatter());
         });
 
     public static void ConfigureControllers(this IServiceCollection services) =>
@@ -63,4 +66,30 @@ public static class ServiceExtensions
         services.AddDbContext<RepositoryContext>(builder =>
             builder.UseSqlServer(configuration.GetConnectionString("SqlConnection"))
         );
+
+    public static void ConfigureDataShaping(this IServiceCollection services)
+    {
+        services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
+        services.AddScoped<IDataShaper<CompanyDto>, DataShaper<CompanyDto>>();
+        services.AddScoped<IEmployeeLinks, EmployeeLinks>();
+        services.AddScoped<ICompanyLinks, CompanyLinks>();
+    }
+
+    public static void ConfigureCustomMediaTypes(this IServiceCollection services) 
+    { 
+        services.Configure<MvcOptions>(config => 
+        {
+            var systemTextJsonOutputFormatter = config.OutputFormatters.OfType<SystemTextJsonOutputFormatter>()?.FirstOrDefault();
+            systemTextJsonOutputFormatter?.SupportedMediaTypes.Add("application/vnd.shinmen.hateoas+json");
+
+            var xmlOutputFormatter = config.OutputFormatters.OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
+            xmlOutputFormatter?.SupportedMediaTypes.Add("application/vnd.shinmen.hateoas+xml");
+        });
+    }
+
+    public static void ConfigureFilters(this IServiceCollection services)
+    {
+        services.AddScoped<ValidationFilterAttribute>();
+        services.AddScoped<ValidateMediaTypeAttribute>();
+    }
 }

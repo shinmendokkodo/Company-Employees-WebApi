@@ -2,12 +2,10 @@
 
 public interface ILoggerManager
 {
-    void LogInfo(string message);
-    void LogInfo<T>(T input);
-    void LogWarn(string message);
-    void LogWarn<T>(T input);
-    void LogDebug(string message);
-    void LogDebug<T>(T input);
-    void LogError(string message);
-    void LogError<T>(T input);
+    void LogTrace(string message, params object[] args);
+    void LogDebug(string message, params object[] args);
+    void LogInfo(string message, params object[] args);
+    void LogWarn(string message, params object[] args);
+    void LogError(string message, params object[] args);
+    void LogFatal(string message, params object[] args);
 }

@@ -1,36 +1,43 @@
 ﻿using AutoMapper;
 using Contracts;
-using Entities;
 using Entities.Exceptions;
+using Entities.LinkModels;
+using Entities.Models;
 using Service.Contracts;
 using Shared.DataTransferObjects;
 using Shared.RequestFeatures;
 
 namespace Service;
 
-internal sealed class EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper) : IEmployeeService
+internal sealed class EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, IEmployeeLinks employeeLinks) : IEmployeeService
 {
-    public async Task<(IEnumerable<EmployeeDto> employeeDtos, Metadata metadata)> GetAllAsync(Guid companyId, EmployeeParameters employeeParams, bool trackEmployee)
+    public async Task<(LinkResponse linkResponse, Metadata metadata)> GetAllAsync(Guid companyId, EmployeeLinkParameters linkParams, bool trackEmployee)
     {
-        if (!employeeParams.ValidAgeRange)
+        if (!linkParams.EmployeeParameters.ValidAgeRange)
+        {
             throw new MaxAgeRangeBadRequestException();
+        }
 
         await CheckCompanyExistsAsync(companyId);
         
-        var employees = await repository.Employee.GetAllAsync(companyId, employeeParams, trackEmployee);
+        var employees = await repository.Employee.GetAllAsync(companyId, linkParams.EmployeeParameters, trackEmployee);
         var employeeDtos = mapper.Map<IEnumerable<EmployeeDto>>(employees);
+        var linkResponse = employeeLinks.TryGenerateLinks(employeeDtos, linkParams.EmployeeParameters.Fields, companyId, linkParams.Context);
 
-        logger.LogInfo($"All employees for company with id: {companyId} were returned successfully.");
-        logger.LogInfo(employeeDtos);
+        logger.LogInfo($"All employees for company with id: {companyId} were returned successfully");
 
-        return (employeeDtos, employees.Metadata);
+        return (linkResponse, employees.Metadata);
     }
 
     public async Task<EmployeeDto> GetByIdAsync(Guid companyId, Guid employeeId, bool trackEmployee)
     {
         await CheckCompanyExistsAsync(companyId);
         var employee = await ReturnEmployeeIfExistsAsync(companyId, employeeId, trackEmployee);
-        return mapper.Map<EmployeeDto>(employee);
+        var employeeDto = mapper.Map<EmployeeDto>(employee);
+
+        logger.LogInfo("Employee: {employee}", employeeDto);
+
+        return employeeDto;
     }
 
     public async Task<EmployeeDto> CreateAsync(Guid companyId, EmployeeCreateDto employeeCreateDto)

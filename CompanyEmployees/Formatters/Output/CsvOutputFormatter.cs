@@ -1,13 +1,12 @@
 ﻿using System.Net.Mime;
 using System.Text;
+using Entities.Models;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
-using Shared.DataTransferObjects;
 
 namespace CompanyEmployees.Formatters.Output;
 
-public class CsvOutputFormatter<T> : TextOutputFormatter
-    where T : BaseDto
+public class CsvOutputFormatter : TextOutputFormatter
 {
     public CsvOutputFormatter()
     {
@@ -16,15 +15,12 @@ public class CsvOutputFormatter<T> : TextOutputFormatter
         SupportedEncodings.Add(Encoding.Unicode);
     }
 
-    public override async Task WriteResponseBodyAsync(
-        OutputFormatterWriteContext context,
-        Encoding selectedEncoding
-    )
+    public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
     {
         var response = context.HttpContext.Response;
         var buffer = new StringBuilder();
 
-        if (context.Object is IEnumerable<T> objects)
+        if (context.Object is IEnumerable<Entity> objects)
         {
             var count = objects.Count();
             for (var i = 0; i < count; i++)
@@ -36,9 +32,9 @@ public class CsvOutputFormatter<T> : TextOutputFormatter
                 }
             }
         }
-        else if (context.Object is T singleObject)
+        else if (context.Object is Entity entity)
         {
-            FormatCsvObject(buffer, singleObject);
+            FormatCsvObject(buffer, entity);
         }
 
         await response.WriteAsync(buffer.ToString());
@@ -46,15 +42,16 @@ public class CsvOutputFormatter<T> : TextOutputFormatter
 
     protected override bool CanWriteType(Type? type)
     {
-        if (typeof(T).IsAssignableFrom(type) || typeof(IEnumerable<T>).IsAssignableFrom(type))
+        if (typeof(Entity).IsAssignableFrom(type) || typeof(IEnumerable<Entity>).IsAssignableFrom(type))
         {
             return base.CanWriteType(type);
         }
         return false;
     }
 
-    private void FormatCsvObject(StringBuilder buffer, T obj)
+    private void FormatCsvObject(StringBuilder buffer, Entity entity)
     {
-        buffer.Append(obj.ToCsvString());
+        var values = entity.Values.Select(value => $"\"{value}\"").ToList();
+        buffer.Append(string.Join(", ", values));
     }
 }

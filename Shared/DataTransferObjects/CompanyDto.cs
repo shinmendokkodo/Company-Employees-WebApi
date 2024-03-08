@@ -1,10 +1,16 @@
-﻿namespace Shared.DataTransferObjects;
+﻿using System.Runtime.Serialization;
 
-public record CompanyDto : BaseDto
+namespace Shared.DataTransferObjects;
+
+[DataContract(Name = "Company")]
+public record CompanyDto
 {
+    [DataMember]
     public Guid Id { get; init; }
-    public string? Name { get; init; }
-    public string? FullAddress { get; init; }
 
-    public override string ToCsvString() => $"\"{Id}\", \"{Name}\", \"{FullAddress}\"";
+    [DataMember]
+    public string? Name { get; init; }
+
+    [DataMember]
+    public string? FullAddress { get; init; }
 }

@@ -1,11 +1,19 @@
-﻿namespace Shared.DataTransferObjects;
+﻿using System.Runtime.Serialization;
 
-public record EmployeeDto : BaseDto
+namespace Shared.DataTransferObjects;
+
+[DataContract(Name = "Employee")]
+public record EmployeeDto
 {
+    [DataMember]
     public Guid Id { get; init; }
-    public string? Name { get; init; } 
+
+    [DataMember]
+    public string? Name { get; init; }
+
+    [DataMember]
     public int Age { get; init; }
+
+    [DataMember]
     public string? Position { get; init; }
-    
-    public override string ToCsvString() => $"\"{Id}\", \"{Name}\", \"{Age}\", \"{Position}\"";
 }

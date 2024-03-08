@@ -1,30 +1,36 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.Design;
+using AutoMapper;
 using Contracts;
-using Entities;
 using Entities.Exceptions;
+using Entities.LinkModels;
+using Entities.Models;
 using Service.Contracts;
 using Shared.DataTransferObjects;
 using Shared.RequestFeatures;
 
 namespace Service;
 
-internal sealed class CompanyService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper) : ICompanyService
+internal sealed class CompanyService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, ICompanyLinks companyLinks) : ICompanyService
 {
-    public async Task<(IEnumerable<CompanyDto> companyDtos, Metadata metadata)> GetAllAsync(CompanyParameters companyParams, bool trackCompany)
+    public async Task<(LinkResponse linkResponse, Metadata metadata)> GetAllAsync(CompanyLinkParameters linkParams, bool trackCompany)
     {
-        var companies = await repository.Company.GetAllAsync(companyParams, trackCompany);
+        var companies = await repository.Company.GetAllAsync(linkParams.CompanyParameters, trackCompany);
         var companyDtos = mapper.Map<IEnumerable<CompanyDto>>(companies);
+        var linkResponse = companyLinks.TryGenerateLinks(companyDtos, linkParams.CompanyParameters.Fields, linkParams.Context);
 
-        logger.LogInfo("All companies were returned successfully.");
-        logger.LogInfo(companyDtos);
+        logger.LogInfo("All companies were returned successfully");
 
-        return (companyDtos, companies.Metadata);
+        return (linkResponse, companies.Metadata);
     }
 
     public async Task<CompanyDto> GetByIdAsync(Guid companyId, bool trackCompany)
     {
         var company = await ReturnCompanyIfExistsAsync(companyId, trackCompany);
-        return mapper.Map<CompanyDto>(company);
+        var companyDto = mapper.Map<CompanyDto>(company);
+
+        logger.LogInfo("Company: {company}", companyDto);
+
+        return companyDto;
     }
 
     public async Task<CompanyDto> CreateAsync(CompanyCreateDto companyCreateDto)
