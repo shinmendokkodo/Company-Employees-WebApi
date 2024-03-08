@@ -34,9 +34,9 @@ public class Entity : DynamicObject, IXmlSerializable, IDictionary<string, objec
         return true;
     }
 
-    public XmlSchema GetSchema()
+    public XmlSchema? GetSchema()
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public void ReadXml(XmlReader reader)
