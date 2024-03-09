@@ -105,7 +105,8 @@ public static class ServiceExtensions
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.DefaultApiVersion = new ApiVersion(1, 0);
             options.ApiVersionReader = new HeaderApiVersionReader("api-version");
-        }).AddMvc(options =>
+        })
+        .AddMvc(options =>
         {
             options.Conventions.Controller<CompaniesController>().HasApiVersion(new(1, 0));
             options.Conventions.Controller<CompaniesV2Controller>().HasDeprecatedApiVersion(new(2, 0));
