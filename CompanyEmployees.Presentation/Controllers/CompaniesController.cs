@@ -15,8 +15,8 @@ namespace CompanyEmployees.Presentation.Controllers;
 [ApiController]
 public class CompaniesController(IServiceManager service) : ControllerBase
 {
-    [HttpGet]
     [HttpHead]
+    [HttpGet(Name = "GetCompanies")]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
     public async Task<IActionResult> GetAll([FromQuery] CompanyParameters companyParams)
     {
@@ -42,7 +42,7 @@ public class CompaniesController(IServiceManager service) : ControllerBase
         return Ok(companies);
     }
 
-    [HttpPost]
+    [HttpPost(Name = "CreateCompany")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> Create([FromBody] CompanyCreateDto companyCreateDto)
     {

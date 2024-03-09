@@ -81,9 +81,11 @@ public static class ServiceExtensions
         {
             var systemTextJsonOutputFormatter = config.OutputFormatters.OfType<SystemTextJsonOutputFormatter>()?.FirstOrDefault();
             systemTextJsonOutputFormatter?.SupportedMediaTypes.Add("application/vnd.shinmen.hateoas+json");
+            systemTextJsonOutputFormatter?.SupportedMediaTypes.Add("application/vnd.shinmen.apiroot+json");
 
             var xmlOutputFormatter = config.OutputFormatters.OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
             xmlOutputFormatter?.SupportedMediaTypes.Add("application/vnd.shinmen.hateoas+xml");
+            xmlOutputFormatter?.SupportedMediaTypes.Add("application/vnd.shinmen.apiroot+xml");
         });
     }
 
