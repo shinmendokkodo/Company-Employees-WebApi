@@ -2,6 +2,7 @@
 using CompanyEmployees.Presentation.ActionFilters;
 using CompanyEmployees.Presentation.ModelBinders;
 using Entities.LinkModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -15,6 +16,7 @@ namespace CompanyEmployees.Presentation.Controllers;
 public class EmployeesController(IServiceManager service) : ControllerBase
 {
     [HttpGet]
+    [HttpHead]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
     public async Task<IActionResult> GetAll(Guid companyId, [FromQuery] EmployeeParameters employeeParams)
     {
@@ -90,5 +92,12 @@ public class EmployeesController(IServiceManager service) : ControllerBase
     {
         await service.EmployeeService.DeleteAsync(companyId, employeeId);
         return NoContent();
+    }
+
+    [HttpOptions]
+    public IActionResult GetOptions()
+    {
+        Response.Headers.Append("Allow", "GET, OPTIONS, POST, PUT, PATCH, DELETE");
+        return Ok();
     }
 }
