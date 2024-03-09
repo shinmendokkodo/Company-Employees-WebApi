@@ -1,7 +1,9 @@
-﻿using CompanyEmployees.Formatters.Input;
+﻿using Asp.Versioning;
+using CompanyEmployees.Formatters.Input;
 using CompanyEmployees.Formatters.Output;
 using CompanyEmployees.Presentation;
 using CompanyEmployees.Presentation.ActionFilters;
+using CompanyEmployees.Presentation.Controllers;
 using CompanyEmployees.Utilities.Links;
 using Contracts;
 using LoggerService;
@@ -93,5 +95,20 @@ public static class ServiceExtensions
     {
         services.AddScoped<ValidationFilterAttribute>();
         services.AddScoped<ValidateMediaTypeAttribute>();
+    }
+
+    public static void ConfigureVersioning(this IServiceCollection services)
+    {
+        services.AddApiVersioning(options =>
+        {
+            options.ReportApiVersions = true;
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.ApiVersionReader = new HeaderApiVersionReader("api-version");
+        }).AddMvc(options =>
+        {
+            options.Conventions.Controller<CompaniesController>().HasApiVersion(new(1, 0));
+            options.Conventions.Controller<CompaniesV2Controller>().HasDeprecatedApiVersion(new(2, 0));
+        });
     }
 }

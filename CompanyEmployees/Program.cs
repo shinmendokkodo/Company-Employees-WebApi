@@ -18,6 +18,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.ConfigureApiBehavior();
 builder.Services.ConfigureFilters();
 builder.Services.ConfigureDataShaping();
+builder.Services.ConfigureVersioning();
 builder.Services.ConfigureControllers();
 builder.Services.ConfigureCustomMediaTypes();
 
